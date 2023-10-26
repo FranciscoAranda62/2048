@@ -1,4 +1,5 @@
 #include "raylib.h"
+#include "game.h"
 #include <string>
 
 // g++ src/main.cpp -o game.exe -static -I include -L lib -l raylib -l opengl32 -l gdi32 -l winmm
@@ -16,7 +17,8 @@ int main(void)
 
     int cellSize = screenWidth / 5;
     int separation = cellSize / 5;
-    int board[4][4] = {{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}, {13, 14, 15, 16}};
+    TBoard board = createNewTBoard();
+    //int board[4][4] = {{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}, {13, 14, 15, 16}};
     //--------------------------------------------------------------------------------------
 
     // Main game loop
@@ -36,7 +38,7 @@ int main(void)
                     int x = separation * j + cellSize * (j - 1);
                     int y = separation * i + cellSize * (i - 1) + 150;
                     DrawRectangle(x, y, cellSize, cellSize, ORANGE);
-                    std::string texto = std::to_string(board[j - 1][i - 1]);
+                    std::string texto = std::to_string(getCellContent(board, j - 1, i - 1));
                     DrawText(texto.c_str(), x, y, cellSize, BLACK);
                 }
             }

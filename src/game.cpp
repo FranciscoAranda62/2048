@@ -12,6 +12,7 @@ struct rep_board {
 
 TBoard createNewTBoard() {
     TBoard nuevo = new rep_board;
+    nuevo->score = 0;
     nuevo->cell = new int*[size]; // Primero asignamos memoria para las filas
     for (int i = 0; i < size; i++) {
         nuevo->cell[i] = new int[size]; // Luego asignamos memoria para las columnas de cada fila
@@ -38,4 +39,8 @@ void getCellFree(TBoard board, int * f, int *c) {
         *f = rand() % size;
         *c = rand() % size;
     } while(isCellOccupied(board, *f, *c));
+}
+
+int getCellContent(TBoard board, int f, int c) {
+    return board->cell[f][c];
 }

@@ -13,4 +13,9 @@ bool isCellOccupied(TBoard board, int f, int c);
 // Get an random free poscition on the board
 void getCellFree(TBoard board, int * f, int *c);
 
+// Return cell content
+int getCellContent(TBoard board, int f, int c);
+
+
+
 #endif
