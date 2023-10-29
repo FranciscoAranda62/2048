@@ -2,6 +2,7 @@
 #include "../include/game.h"
 #include <time.h>
 #include <stdlib.h>
+#include <string>
 
 #define size 4
 
@@ -43,4 +44,15 @@ void getCellFree(TBoard board, int * f, int *c) {
 
 int getCellContent(TBoard board, int f, int c) {
     return board->cell[f][c];
+}
+void drawBoard(TBoard board, int cellSize, int separation) {
+    for (int i = 1; i <= 4; i++) {
+                for (int j = 1; j <= 4; j++) {
+                    int x = separation * j + cellSize * (j - 1);
+                    int y = separation * i + cellSize * (i - 1) + 150;
+                    DrawRectangle(x, y, cellSize, cellSize, ORANGE);
+                    std::string texto = std::to_string(getCellContent(board, j - 1, i - 1));
+                    DrawText(texto.c_str(), x, y, cellSize, BLACK);
+                }
+            }
 }

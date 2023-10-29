@@ -16,6 +16,6 @@ void getCellFree(TBoard board, int * f, int *c);
 // Return cell content
 int getCellContent(TBoard board, int f, int c);
 
-
+void drawBoard(TBoard board, int CellSize, int separation);
 
 #endif
