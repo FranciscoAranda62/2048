@@ -16,6 +16,10 @@ void getCellFree(TBoard board, int * f, int *c);
 // Return cell content
 int getCellContent(TBoard board, int f, int c);
 
-void drawBoard(TBoard board, int CellSize, int separation);
+void drawBoard(TBoard board, int cellSize, int separation);
+
+// Retrona un numero aletaorio dentro de los validos
+// Si maxNum es 2, el numero aleatorio sera 2 o 4
+int getRandomNum(int maxNum);
 
 #endif
