@@ -1,8 +1,9 @@
 #include "../include/raylib.h"
-#include "../include/game.h"
+#include "../include/board.h"
+#include <time.h>
+#include <stdlib.h>
 
-
-// g++ src/main.cpp src/game.cpp -o game.exe -static -I include -L lib -l raylib -l opengl32 -l gdi32 -l winmm
+// g++ src/main.cpp src/board.cpp -o game.exe -static -I include -L lib -l raylib -l opengl32 -l gdi32 -l winmm
 //------------------------------------------------------------------------------------
 // Program main entry point
 //------------------------------------------------------------------------------------
@@ -12,12 +13,15 @@ int main(void)
     //--------------------------------------------------------------------------------------
     const int screenWidth = 500;
     const int screenHeight = 800;
-    InitWindow(screenWidth, screenHeight, "raylib [core] example - keyboard input");
+    InitWindow(screenWidth, screenHeight, "2048");
     SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
+
+    unsigned int seed = (unsigned int)time(NULL);
+    srand(seed); // Inicializar la semilla
 
     int cellSize = screenWidth / 5;
     int separation = cellSize / 5;
-    TBoard board = createNewTBoard();
+    TBoard board = createNewTBoard(&seed);
     //int board[4][4] = {{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}, {13, 14, 15, 16}};
     //--------------------------------------------------------------------------------------
 
