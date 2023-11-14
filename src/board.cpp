@@ -25,7 +25,9 @@ TBoard createNewTBoard(unsigned int *seed) {
             nuevo->cell[i][j] = 0; 
         }
     }
-    nuevo->cell[0][0] = getRandomNum(nuevo, seed);
+    int fila, columna;
+    getRandomCellFree(nuevo, &fila, &columna, seed);
+    nuevo->cell[fila][columna] = getRandomNum(nuevo, seed);
     return nuevo;
 }
 
