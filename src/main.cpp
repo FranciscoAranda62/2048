@@ -30,7 +30,14 @@ int main(void)
     {
         // Update
         //----------------------------------------------------------------------------------
-        
+        if (IsKeyDown(KEY_RIGHT))
+            moveRight(board, &seed);
+        if (IsKeyDown(KEY_LEFT))
+            moveLeft(board, &seed);
+        if (IsKeyDown(KEY_UP))
+            moveUp(board, &seed);
+        if (IsKeyDown(KEY_DOWN))
+            moveDown(board, &seed);
         //----------------------------------------------------------------------------------
 
         // Draw

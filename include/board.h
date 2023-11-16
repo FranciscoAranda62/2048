@@ -18,4 +18,12 @@ void drawBoard(TBoard board, int cellSize, int separation);
 // Si maxNum es 2, el numero aleatorio sera 2 o 4
 int getRandomNum(TBoard board, unsigned int *seed);
 
+void moveLeft(TBoard board, unsigned int *seed);
+
+void moveRight(TBoard board, unsigned int *seed);
+
+void moveUp(TBoard board, unsigned int *seed);
+
+void moveDown(TBoard board, unsigned int *seed);
+
 #endif
