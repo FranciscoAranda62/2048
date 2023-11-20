@@ -50,6 +50,8 @@ void getRandomCellFree(TBoard board, int *fila, int *columna, unsigned int *seed
         int indiceAleatorio = rand() % contador;
         *fila = posicionesVacias[indiceAleatorio][0];
         *columna = posicionesVacias[indiceAleatorio][1];
+        // Actualizar la semilla después de generar el número aleatorio
+        *seed = rand();
     } else {
         // Si no se encontraron posiciones vacías, se establecen valores fuera del rango del arreglo
         *fila = -1;
@@ -80,6 +82,8 @@ int getRandomNum(TBoard board, unsigned int *seed) {
     srand(*seed);
     // Obtener un número aleatorio en el rango 0-maxNum
     int randomIndex = (rand() % board->dificult - 1) + 2;
+    // Actualizar la semilla después de generar el número aleatorio
+    *seed = rand();
     // Devolver el número aleatorio
     return pow(2, randomIndex);
 }
