@@ -22,7 +22,13 @@ int main(void)
     int cellSize = screenWidth / 5;
     int separation = cellSize / 5;
     TBoard board = createNewTBoard(&seed);
-    //int board[4][4] = {{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}, {13, 14, 15, 16}};
+
+    // Definir variables de estado para cada tecla
+    bool rightKeyPressed = false;
+    bool leftKeyPressed = false;
+    bool upKeyPressed = false;
+    bool downKeyPressed = false;
+
     //--------------------------------------------------------------------------------------
 
     // Main game loop
@@ -30,14 +36,41 @@ int main(void)
     {
         // Update
         //----------------------------------------------------------------------------------
-        if (IsKeyDown(KEY_RIGHT))
-            moveRight(board, &seed);
-        if (IsKeyDown(KEY_LEFT))
-            moveLeft(board, &seed);
-        if (IsKeyDown(KEY_UP))
-            moveUp(board, &seed);
-        if (IsKeyDown(KEY_DOWN))
-            moveDown(board, &seed);
+        if (IsKeyDown(KEY_RIGHT)) {
+            if (!rightKeyPressed) {
+                moveRight(board, &seed);
+                rightKeyPressed = true;
+            }
+        } else {
+            rightKeyPressed = false;
+        }
+        
+        if (IsKeyDown(KEY_LEFT)) {
+            if (!leftKeyPressed) {
+                moveLeft(board, &seed);
+                leftKeyPressed = true;
+            }
+        } else {
+            leftKeyPressed = false;
+        }
+
+        if (IsKeyDown(KEY_UP)) {
+            if (!upKeyPressed) {
+                moveUp(board, &seed);
+                upKeyPressed = true;
+            }
+        } else {
+            upKeyPressed = false;
+        }
+
+        if (IsKeyDown(KEY_DOWN)) {
+            if (!downKeyPressed) {
+                moveDown(board, &seed);
+                downKeyPressed = true;
+            }
+        } else {
+            downKeyPressed = false;
+        }
         //----------------------------------------------------------------------------------
 
         // Draw
