@@ -101,6 +101,14 @@ void moveLeft(TBoard board, unsigned int *seed) {
                 if (aux < size) {
                     board->cell[j][i] = board->cell[aux][i];
                     board->cell[aux][i] = 0;
+                    aux++;
+                }
+                while (aux < size && board->cell[aux][i] == 0) {
+                    aux++;
+                }
+                if (aux < size && board->cell[aux][i] == board->cell[j][i]){
+                    board->cell[j][i] = board->cell[j][i] * 2;
+                    board->cell[aux][i] = 0;
                 }
             } else {
                 while (aux < size && board->cell[aux][i] == 0) {
@@ -130,6 +138,14 @@ void moveRight(TBoard board, unsigned int *seed) {
                 }
                 if (aux >= 0) {
                     board->cell[j][i] = board->cell[aux][i];
+                    board->cell[aux][i] = 0;
+                    aux--;
+                }
+                while (aux >= 0 && board->cell[aux][i] == 0) {
+                    aux--;
+                }
+                if (aux >= 0 && board->cell[aux][i] == board->cell[j][i]){
+                    board->cell[j][i] = board->cell[j][i] * 2;
                     board->cell[aux][i] = 0;
                 }
             } else {
@@ -161,6 +177,14 @@ void moveUp(TBoard board, unsigned int *seed) {
                 if (aux < size) {
                     board->cell[i][j] = board->cell[i][aux];
                     board->cell[i][aux] = 0;
+                    aux++;
+                }
+                while (aux < size && board->cell[i][aux] == 0) {
+                    aux++;
+                }
+                if (aux < size && board->cell[i][aux] == board->cell[i][j]){
+                    board->cell[i][j] = board->cell[i][j] * 2;
+                    board->cell[i][aux] = 0;
                 }
             } else {
                 while (aux < size && board->cell[i][aux] == 0) {
@@ -190,6 +214,14 @@ void moveDown(TBoard board, unsigned int *seed) {
                 }
                 if (aux >= 0) {
                     board->cell[i][j] = board->cell[i][aux];
+                    board->cell[i][aux] = 0;
+                    aux--;
+                }
+                while (aux >= 0 && board->cell[i][aux] == 0) {
+                    aux--;
+                }
+                if (aux >= 0 && board->cell[i][aux] == board->cell[i][j]){
+                    board->cell[i][j] = board->cell[i][j] * 2;
                     board->cell[i][aux] = 0;
                 }
             } else {
