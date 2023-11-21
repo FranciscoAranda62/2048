@@ -8,6 +8,8 @@
 
 #define size 4
 
+#define MAX_COLORS_COUNT 21          // Number of colors available
+
 struct rep_board {
     int score;
     int cell[size][size];
@@ -15,6 +17,11 @@ struct rep_board {
 };
 
 enum direccion {izquierda, derecha, arriba, abajo};
+
+Color colors[MAX_COLORS_COUNT] = {
+        DARKGRAY, MAROON, ORANGE, DARKGREEN, DARKBLUE, DARKPURPLE, DARKBROWN,
+        GRAY, RED, GOLD, LIME, BLUE, VIOLET, BROWN, LIGHTGRAY, PINK, YELLOW,
+        GREEN, SKYBLUE, PURPLE, BEIGE };
 
 TBoard createNewTBoard(unsigned int *seed) {
     TBoard nuevo = new rep_board;
@@ -66,13 +73,15 @@ int getCellContent(TBoard board, int f, int c) {
 void drawBoard(TBoard board, int cellSize, int separation) {
     for (int i = 1; i <= 4; i++) {
         for (int j = 1; j <= 4; j++) {
-            //Calula la pocicion de la nueva celda en cada iteracion
-            int x = separation * j + cellSize * (j - 1);
-            int y = separation * i + cellSize * (i - 1) + 150;
-            //Dibuja la celda y imprime el contenido del tablero
-            DrawRectangle(x, y, cellSize, cellSize, ORANGE);
-            std::string texto = std::to_string(getCellContent(board, j - 1, i - 1));
-            DrawText(texto.c_str(), x, y, cellSize, BLACK);
+            if (getCellContent(board, j - 1, i - 1) != 0) {
+                //Calula la pocicion de la nueva celda en cada iteracion
+                int x = separation * j + cellSize * (j - 1);
+                int y = separation * i + cellSize * (i - 1) + 150;
+                //Dibuja la celda y imprime el contenido del tablero
+                DrawRectangle(x, y, cellSize, cellSize, colors[(int)log2(getCellContent(board, j - 1, i - 1))]);
+                std::string texto = std::to_string(getCellContent(board, j - 1, i - 1));
+                DrawText(texto.c_str(), x, y, cellSize, BLACK);
+            }
         }
     }
 }
