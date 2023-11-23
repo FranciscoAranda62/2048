@@ -6,17 +6,23 @@
 #include <stdio.h>
 #include <math.h>
 
-#define size 4
+#define SIZE 4
 
-#define MAX_COLORS_COUNT 21          // Number of colors available
+#define MAX_COLORS_COUNT 21 // Number of colors available
+
+struct AnimatedCell {
+    int fromX, fromY;  // Initial cell position
+    int toX, toY;      // New cell position
+    int value;         // Cell value
+    float progress;    // Animation progress (0.0 a 1.0)
+};
+
 
 struct rep_board {
     int score;
-    int cell[size][size];
     int dificult;
+    AnimatedCell cell[SIZE][SIZE];
 };
-
-enum direccion {izquierda, derecha, arriba, abajo};
 
 Color colors[MAX_COLORS_COUNT] = {
         DARKGRAY, MAROON, ORANGE, DARKGREEN, DARKBLUE, DARKPURPLE, DARKBROWN,
@@ -27,14 +33,17 @@ TBoard createNewTBoard(unsigned int *seed) {
     TBoard nuevo = new rep_board;
     nuevo->score = 0;
     nuevo->dificult = 3;
-    for (int i = 0; i < size; i++) {
-        for (int j = 0; j < size; j++){
-            nuevo->cell[i][j] = 0; 
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++){
+            nuevo->cell[i][j].value = 0; 
         }
     }
     int fila, columna;
     getRandomCellFree(nuevo, &fila, &columna, seed);
-    nuevo->cell[fila][columna] = getRandomNum(nuevo, seed);
+    nuevo->cell[fila][columna].value = getRandomNum(nuevo, seed);
+    nuevo->cell[fila][columna].toX = fila;
+    nuevo->cell[fila][columna].toY = columna;
+    nuevo->cell[fila][columna].progress = 0;
     return nuevo;
 }
 
@@ -44,7 +53,7 @@ void getRandomCellFree(TBoard board, int *fila, int *columna, unsigned int *seed
     // Buscar posiciones vacías y almacenarlas en la matriz
     for (int i = 0; i < 4; ++i) {
         for (int j = 0; j < 4; ++j) {
-            if (board->cell[i][j] == 0) {
+            if (board->cell[i][j].value == 0) {
                 posicionesVacias[contador][0] = i;
                 posicionesVacias[contador][1] = j;
                 contador++;
@@ -67,7 +76,7 @@ void getRandomCellFree(TBoard board, int *fila, int *columna, unsigned int *seed
 }
 
 int getCellContent(TBoard board, int f, int c) {
-    return board->cell[f][c];
+    return board->cell[f][c].value;
 }
 
 void drawBoard(TBoard board, int cellSize, int separation) {
@@ -98,153 +107,165 @@ int getRandomNum(TBoard board, unsigned int *seed) {
 }
 
 void moveLeft(TBoard board, unsigned int *seed) {
-    for (int i = 0; i < size; i++) {
-        for (int j = 0; j < size - 1; j++) {
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE - 1; j++) {
             int aux = j + 1;
             // Si el valor que esta en esa celda es 0 va a buscar el proximo valor distinto de 0 y lo va asignar a reasignar.
             // Si el valor que esta en esa celda es distinto de 0 va a ver si hay uno identico en lo que queda del arreglo. 
-            if (board->cell[j][i] == 0) {
-                while (aux < size && board->cell[aux][i] == board->cell[j][i]) {
+            if (board->cell[j][i].value == 0) {
+                while (aux < SIZE && board->cell[aux][i].value == board->cell[j][i].value) {
                     aux++;
                 }
-                if (aux < size) {
-                    board->cell[j][i] = board->cell[aux][i];
-                    board->cell[aux][i] = 0;
+                if (aux < SIZE) {
+                    board->cell[j][i].value = board->cell[aux][i].value;
+                    board->cell[aux][i].value = 0;
                     aux++;
                 }
-                while (aux < size && board->cell[aux][i] == 0) {
+                while (aux < SIZE && board->cell[aux][i].value == 0) {
                     aux++;
                 }
-                if (aux < size && board->cell[aux][i] == board->cell[j][i]){
-                    board->cell[j][i] = board->cell[j][i] * 2;
-                    board->cell[aux][i] = 0;
+                if (aux < SIZE && board->cell[aux][i].value == board->cell[j][i].value){
+                    board->cell[j][i].value = board->cell[j][i].value * 2;
+                    board->cell[aux][i].value = 0;
                 }
             } else {
-                while (aux < size && board->cell[aux][i] == 0) {
+                while (aux < SIZE && board->cell[aux][i].value == 0) {
                     aux++;
                 }
-                if (aux < size && board->cell[aux][i] == board->cell[j][i]){
-                    board->cell[j][i] = board->cell[j][i] * 2;
-                    board->cell[aux][i] = 0;
+                if (aux < SIZE && board->cell[aux][i].value == board->cell[j][i].value){
+                    board->cell[j][i].value = board->cell[j][i].value * 2;
+                    board->cell[aux][i].value = 0;
                 }
             }
         }
     }
     int fila, columna;
     getRandomCellFree(board, &fila, &columna, seed);
-    board->cell[columna][fila] = getRandomNum(board, seed);
+    board->cell[columna][fila].value = getRandomNum(board, seed);
+    board->cell[fila][columna].toX = fila;
+    board->cell[fila][columna].toY = columna;
+    board->cell[fila][columna].progress = 0;
 }
 
 void moveRight(TBoard board, unsigned int *seed) {
-    for (int i = 0; i < size; i++) {
-        for (int j = size - 1; j > 0; j--) {
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = SIZE - 1; j > 0; j--) {
             int aux = j - 1;
             // Si el valor que esta en esa celda es 0 va a buscar el proximo valor distinto de 0 y lo va asignar a reasignar.
             // Si el valor que esta en esa celda es distinto de 0 va a ver si hay uno identico en lo que queda del arreglo. 
-            if (board->cell[j][i] == 0) {
-                while (aux >= 0 && board->cell[aux][i] == board->cell[j][i]) {
+            if (board->cell[j][i].value == 0) {
+                while (aux >= 0 && board->cell[aux][i].value == board->cell[j][i].value) {
                     aux--;
                 }
                 if (aux >= 0) {
-                    board->cell[j][i] = board->cell[aux][i];
-                    board->cell[aux][i] = 0;
+                    board->cell[j][i].value = board->cell[aux][i].value;
+                    board->cell[aux][i].value = 0;
                     aux--;
                 }
-                while (aux >= 0 && board->cell[aux][i] == 0) {
+                while (aux >= 0 && board->cell[aux][i].value == 0) {
                     aux--;
                 }
-                if (aux >= 0 && board->cell[aux][i] == board->cell[j][i]){
-                    board->cell[j][i] = board->cell[j][i] * 2;
-                    board->cell[aux][i] = 0;
+                if (aux >= 0 && board->cell[aux][i].value == board->cell[j][i].value){
+                    board->cell[j][i].value = board->cell[j][i].value * 2;
+                    board->cell[aux][i].value = 0;
                 }
             } else {
-                while (aux >= 0 && board->cell[aux][i] == 0) {
+                while (aux >= 0 && board->cell[aux][i].value == 0) {
                     aux--;
                 }
-                if (aux >= 0 && board->cell[aux][i] == board->cell[j][i]){
-                    board->cell[j][i] = board->cell[j][i] * 2;
-                    board->cell[aux][i] = 0;
+                if (aux >= 0 && board->cell[aux][i].value == board->cell[j][i].value){
+                    board->cell[j][i].value = board->cell[j][i].value * 2;
+                    board->cell[aux][i].value = 0;
                 }
             }
         }
     }
     int fila, columna;
     getRandomCellFree(board, &fila, &columna, seed);
-    board->cell[fila][columna] = getRandomNum(board, seed);
+    board->cell[fila][columna].value = getRandomNum(board, seed);
+    board->cell[fila][columna].toX = fila;
+    board->cell[fila][columna].toY = columna;
+    board->cell[fila][columna].progress = 0;
 }
 
 void moveUp(TBoard board, unsigned int *seed) {
-    for (int i = 0; i < size; i++) {
-        for (int j = 0; j < size; j++) {
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++) {
             int aux = j + 1;
             // Si el valor que esta en esa celda es 0 va a buscar el proximo valor distinto de 0 y lo va asignar a reasignar.
             // Si el valor que esta en esa celda es distinto de 0 va a ver si hay uno identico en lo que queda del arreglo. 
-            if (board->cell[i][j] == 0) {
-                while (aux < size && board->cell[i][aux] == board->cell[i][j]) {
+            if (board->cell[i][j].value == 0) {
+                while (aux < SIZE && board->cell[i][aux].value == board->cell[i][j].value) {
                     aux++;
                 }
-                if (aux < size) {
-                    board->cell[i][j] = board->cell[i][aux];
-                    board->cell[i][aux] = 0;
+                if (aux < SIZE) {
+                    board->cell[i][j].value = board->cell[i][aux].value;
+                    board->cell[i][aux].value = 0;
                     aux++;
                 }
-                while (aux < size && board->cell[i][aux] == 0) {
+                while (aux < SIZE && board->cell[i][aux].value == 0) {
                     aux++;
                 }
-                if (aux < size && board->cell[i][aux] == board->cell[i][j]){
-                    board->cell[i][j] = board->cell[i][j] * 2;
-                    board->cell[i][aux] = 0;
+                if (aux < SIZE && board->cell[i][aux].value == board->cell[i][j].value){
+                    board->cell[i][j].value = board->cell[i][j].value * 2;
+                    board->cell[i][aux].value = 0;
                 }
             } else {
-                while (aux < size && board->cell[i][aux] == 0) {
+                while (aux < SIZE && board->cell[i][aux].value == 0) {
                     aux++;
                 }
-                if (aux < size && board->cell[i][aux] == board->cell[i][j]){
-                    board->cell[i][j] = board->cell[i][j] * 2;
-                    board->cell[i][aux] = 0;
+                if (aux < SIZE && board->cell[i][aux].value == board->cell[i][j].value){
+                    board->cell[i][j].value = board->cell[i][j].value * 2;
+                    board->cell[i][aux].value = 0;
                 }
             }
         }
     }
     int fila, columna;
     getRandomCellFree(board, &fila, &columna, seed);
-    board->cell[fila][columna] = getRandomNum(board, seed);
+    board->cell[fila][columna].value = getRandomNum(board, seed);
+    board->cell[fila][columna].toX = fila;
+    board->cell[fila][columna].toY = columna;
+    board->cell[fila][columna].progress = 0;
 }
 
 void moveDown(TBoard board, unsigned int *seed) {
-    for (int i = 0; i < size; i++) {
-        for (int j = size - 1; j > 0; j--) {
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = SIZE - 1; j > 0; j--) {
             int aux = j - 1;
             // Si el valor que esta en esa celda es 0 va a buscar el proximo valor distinto de 0 y lo va asignar a reasignar.
             // Si el valor que esta en esa celda es distinto de 0 va a ver si hay uno identico en lo que queda del arreglo. 
-            if (board->cell[i][j] == 0) {
-                while (aux >= 0 && board->cell[i][aux] == board->cell[i][j]) {
+            if (board->cell[i][j].value == 0) {
+                while (aux >= 0 && board->cell[i][aux].value == board->cell[i][j].value) {
                     aux--;
                 }
                 if (aux >= 0) {
-                    board->cell[i][j] = board->cell[i][aux];
-                    board->cell[i][aux] = 0;
+                    board->cell[i][j].value = board->cell[i][aux].value;
+                    board->cell[i][aux].value = 0;
                     aux--;
                 }
-                while (aux >= 0 && board->cell[i][aux] == 0) {
+                while (aux >= 0 && board->cell[i][aux].value == 0) {
                     aux--;
                 }
-                if (aux >= 0 && board->cell[i][aux] == board->cell[i][j]){
-                    board->cell[i][j] = board->cell[i][j] * 2;
-                    board->cell[i][aux] = 0;
+                if (aux >= 0 && board->cell[i][aux].value == board->cell[i][j].value){
+                    board->cell[i][j].value = board->cell[i][j].value * 2;
+                    board->cell[i][aux].value = 0;
                 }
             } else {
-                while (aux >= 0 && board->cell[i][aux] == 0) {
+                while (aux >= 0 && board->cell[i][aux].value == 0) {
                     aux--;
                 }
-                if (aux >= 0 && board->cell[i][aux] == board->cell[i][j]){
-                    board->cell[i][j] = board->cell[i][j] * 2;
-                    board->cell[i][aux] = 0;
+                if (aux >= 0 && board->cell[i][aux].value == board->cell[i][j].value){
+                    board->cell[i][j].value = board->cell[i][j].value * 2;
+                    board->cell[i][aux].value = 0;
                 }
             }
         }
     }
     int fila, columna;
     getRandomCellFree(board, &fila, &columna, seed);
-    board->cell[fila][columna] = getRandomNum(board, seed);
+    board->cell[fila][columna].value = getRandomNum(board, seed);
+    board->cell[fila][columna].toX = fila;
+    board->cell[fila][columna].toY = columna;
+    board->cell[fila][columna].progress = 0;
 }
