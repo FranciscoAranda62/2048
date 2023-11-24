@@ -40,10 +40,12 @@ TBoard createNewTBoard(unsigned int *seed) {
     }
     int fila, columna;
     getRandomCellFree(nuevo, &fila, &columna, seed);
-    nuevo->cell[fila][columna].value = getRandomNum(nuevo, seed);
-    nuevo->cell[fila][columna].toX = fila;
-    nuevo->cell[fila][columna].toY = columna;
-    nuevo->cell[fila][columna].progress = 0;
+    nuevo->cell[columna][fila].value = getRandomNum(nuevo, seed);
+    nuevo->cell[columna][fila].fromX = fila;
+    nuevo->cell[columna][fila].fromY = columna;
+    nuevo->cell[columna][fila].toX = fila;
+    nuevo->cell[columna][fila].toY = columna;
+    nuevo->cell[columna][fila].progress = 1;
     return nuevo;
 }
 
@@ -64,8 +66,8 @@ void getRandomCellFree(TBoard board, int *fila, int *columna, unsigned int *seed
         // Generar un índice aleatorio y obtener la posición correspondiente
         srand(*seed); // Usar la semilla proporcionada
         int indiceAleatorio = rand() % contador;
-        *fila = posicionesVacias[indiceAleatorio][0];
-        *columna = posicionesVacias[indiceAleatorio][1];
+        *columna = posicionesVacias[indiceAleatorio][0];
+        *fila = posicionesVacias[indiceAleatorio][1];
         // Actualizar la semilla después de generar el número aleatorio
         *seed = rand();
     } else {
@@ -79,16 +81,20 @@ int getCellContent(TBoard board, int f, int c) {
     return board->cell[f][c].value;
 }
 
+int lerp(int a, int b, float t) {
+    return a + static_cast<int>(t * (b - a));
+}
+
 void drawBoard(TBoard board, int cellSize, int separation) {
-    for (int i = 1; i <= 4; i++) {
-        for (int j = 1; j <= 4; j++) {
-            if (getCellContent(board, j - 1, i - 1) != 0) {
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++) {
+            if (getCellContent(board, j, i) != 0) {
                 //Calula la pocicion de la nueva celda en cada iteracion
-                int x = separation * j + cellSize * (j - 1);
-                int y = separation * i + cellSize * (i - 1) + 150;
+                int x = separation * (j + 1) + cellSize * (j);
+                int y = separation * (i + 1) + cellSize * (i) + 150;
                 //Dibuja la celda y imprime el contenido del tablero
-                DrawRectangle(x, y, cellSize, cellSize, colors[(int)log2(getCellContent(board, j - 1, i - 1))]);
-                std::string texto = std::to_string(getCellContent(board, j - 1, i - 1));
+                DrawRectangle(x, y, cellSize, cellSize, colors[(int)log2(getCellContent(board, j, i))]);
+                std::string texto = std::to_string(getCellContent(board, j, i));
                 DrawText(texto.c_str(), x, y, cellSize, BLACK);
             }
         }
@@ -108,7 +114,7 @@ int getRandomNum(TBoard board, unsigned int *seed) {
 
 void moveLeft(TBoard board, unsigned int *seed) {
     for (int i = 0; i < SIZE; i++) {
-        for (int j = 0; j < SIZE - 1; j++) {
+        for (int j = 0; j < SIZE; j++) {
             int aux = j + 1;
             // Si el valor que esta en esa celda es 0 va a buscar el proximo valor distinto de 0 y lo va asignar a reasignar.
             // Si el valor que esta en esa celda es distinto de 0 va a ver si hay uno identico en lo que queda del arreglo. 
@@ -142,9 +148,11 @@ void moveLeft(TBoard board, unsigned int *seed) {
     int fila, columna;
     getRandomCellFree(board, &fila, &columna, seed);
     board->cell[columna][fila].value = getRandomNum(board, seed);
-    board->cell[fila][columna].toX = fila;
-    board->cell[fila][columna].toY = columna;
-    board->cell[fila][columna].progress = 0;
+    board->cell[columna][fila].fromX = fila;
+    board->cell[columna][fila].fromY = columna;
+    board->cell[columna][fila].toX = fila;
+    board->cell[columna][fila].toY = columna;
+    board->cell[columna][fila].progress = 1;
 }
 
 void moveRight(TBoard board, unsigned int *seed) {
@@ -182,10 +190,12 @@ void moveRight(TBoard board, unsigned int *seed) {
     }
     int fila, columna;
     getRandomCellFree(board, &fila, &columna, seed);
-    board->cell[fila][columna].value = getRandomNum(board, seed);
-    board->cell[fila][columna].toX = fila;
-    board->cell[fila][columna].toY = columna;
-    board->cell[fila][columna].progress = 0;
+    board->cell[columna][fila].value = getRandomNum(board, seed);
+    board->cell[columna][fila].fromX = fila;
+    board->cell[columna][fila].fromY = columna;
+    board->cell[columna][fila].toX = fila;
+    board->cell[columna][fila].toY = columna;
+    board->cell[columna][fila].progress = 1;
 }
 
 void moveUp(TBoard board, unsigned int *seed) {
@@ -223,10 +233,12 @@ void moveUp(TBoard board, unsigned int *seed) {
     }
     int fila, columna;
     getRandomCellFree(board, &fila, &columna, seed);
-    board->cell[fila][columna].value = getRandomNum(board, seed);
-    board->cell[fila][columna].toX = fila;
-    board->cell[fila][columna].toY = columna;
-    board->cell[fila][columna].progress = 0;
+    board->cell[columna][fila].value = getRandomNum(board, seed);
+    board->cell[columna][fila].fromX = fila;
+    board->cell[columna][fila].fromY = columna;
+    board->cell[columna][fila].toX = fila;
+    board->cell[columna][fila].toY = columna;
+    board->cell[columna][fila].progress = 1;
 }
 
 void moveDown(TBoard board, unsigned int *seed) {
@@ -264,8 +276,10 @@ void moveDown(TBoard board, unsigned int *seed) {
     }
     int fila, columna;
     getRandomCellFree(board, &fila, &columna, seed);
-    board->cell[fila][columna].value = getRandomNum(board, seed);
-    board->cell[fila][columna].toX = fila;
-    board->cell[fila][columna].toY = columna;
-    board->cell[fila][columna].progress = 0;
+    board->cell[columna][fila].value = getRandomNum(board, seed);
+    board->cell[columna][fila].fromX = fila;
+    board->cell[columna][fila].fromY = columna;
+    board->cell[columna][fila].toX = fila;
+    board->cell[columna][fila].toY = columna;
+    board->cell[columna][fila].progress = 1;
 }
