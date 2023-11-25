@@ -10,10 +10,11 @@
 
 #define MAX_COLORS_COUNT 21 // Number of colors available
 
+const float animationSpeed = 0.05;
+
 struct AnimatedCell {
-    int fromX, fromY;  // Initial cell position
-    int toX, toY;      // New cell position
-    int value;         // Cell value
+    int toF, toC;      // New cell position
+    int value, beforeValue; // Cell value
     float progress;    // Animation progress (0.0 a 1.0)
 };
 
@@ -26,9 +27,10 @@ struct rep_board {
 };
 
 Color colors[MAX_COLORS_COUNT] = {
-        DARKGRAY, MAROON, ORANGE, DARKGREEN, DARKBLUE, DARKPURPLE, DARKBROWN,
-        GRAY, RED, GOLD, LIME, BLUE, VIOLET, BROWN, LIGHTGRAY, PINK, YELLOW,
-        GREEN, SKYBLUE, PURPLE, BEIGE };
+    DARKGRAY, MAROON, ORANGE, DARKGREEN, DARKBLUE, DARKPURPLE, DARKBROWN,
+    GRAY, RED, GOLD, LIME, BLUE, VIOLET, BROWN, LIGHTGRAY, PINK, YELLOW,
+    GREEN, SKYBLUE, PURPLE, BEIGE 
+};
 
 TBoard createNewTBoard(unsigned int *seed) {
     TBoard nuevo = new rep_board;
@@ -37,21 +39,31 @@ TBoard createNewTBoard(unsigned int *seed) {
     nuevo->statusAnimation = false;
     for (int i = 0; i < SIZE; i++) {
         for (int j = 0; j < SIZE; j++){
-            nuevo->cell[i][j].value = 0; 
+            nuevo->cell[i][j].value = 0;
+            nuevo->cell[i][j].beforeValue = 0;
+            nuevo->cell[i][j].progress = 1;
+            nuevo->cell[i][j].toF = j;
+            nuevo->cell[i][j].toC = i;
         }
     }
     int fila, columna;
     getRandomCellFree(nuevo, &fila, &columna, seed);
     nuevo->cell[columna][fila].value = getRandomNum(nuevo, seed);
-    nuevo->cell[columna][fila].fromX = fila;
-    nuevo->cell[columna][fila].fromY = columna;
-    nuevo->cell[columna][fila].toX = fila;
-    nuevo->cell[columna][fila].toY = columna;
+    nuevo->cell[columna][fila].toF = fila;
+    nuevo->cell[columna][fila].toC = columna;
     nuevo->cell[columna][fila].progress = 1;
     return nuevo;
 }
 
-void getRandomCellFree(TBoard board, int *fila, int *columna, unsigned int *seed) {
+int getCellContent(TBoard board, int f, int c) {
+    return board->cell[f][c].value;
+}
+
+bool getStatusAnimation(TBoard board) {
+    return board->statusAnimation;
+}
+
+void getRandomCellFree(TBoard board, int *toFila, int *tocolumna, unsigned int *seed) {
     int posicionesVacias[16][2]; // Matriz para almacenar las posiciones vacías
     int contador = 0;
     // Buscar posiciones vacías y almacenarlas en la matriz
@@ -68,27 +80,26 @@ void getRandomCellFree(TBoard board, int *fila, int *columna, unsigned int *seed
         // Generar un índice aleatorio y obtener la posición correspondiente
         srand(*seed); // Usar la semilla proporcionada
         int indiceAleatorio = rand() % contador;
-        *columna = posicionesVacias[indiceAleatorio][0];
-        *fila = posicionesVacias[indiceAleatorio][1];
+        *tocolumna = posicionesVacias[indiceAleatorio][0];
+        *toFila = posicionesVacias[indiceAleatorio][1];
         // Actualizar la semilla después de generar el número aleatorio
         *seed = rand();
     } else {
         // Si no se encontraron posiciones vacías, se establecen valores fuera del rango del arreglo
-        *fila = -1;
-        *columna = -1;
+        *toFila = -1;
+        *tocolumna = -1;
     }
 }
 
-int getCellContent(TBoard board, int f, int c) {
-    return board->cell[f][c].value;
-}
-
-bool getStatusAnimation(TBoard board) {
-    return board->statusAnimation;
-}
-
-int lerp(int a, int b, float t) {
-    return a + static_cast<int>(t * (b - a));
+int getRandomNum(TBoard board, unsigned int *seed) {
+    // Inicializar el generador de números aleatorios con la semilla proporcionada
+    srand(*seed);
+    // Obtener un número aleatorio en el rango 0-maxNum
+    int randomIndex = (rand() % board->dificult - 1) + 2;
+    // Actualizar la semilla después de generar el número aleatorio
+    *seed = rand();
+    // Devolver el número aleatorio
+    return pow(2, randomIndex);
 }
 
 void drawBoard(TBoard board, int cellSize, int separation) {
@@ -107,46 +118,103 @@ void drawBoard(TBoard board, int cellSize, int separation) {
     }
 }
 
-int getRandomNum(TBoard board, unsigned int *seed) {
-    // Inicializar el generador de números aleatorios con la semilla proporcionada
-    srand(*seed);
-    // Obtener un número aleatorio en el rango 0-maxNum
-    int randomIndex = (rand() % board->dificult - 1) + 2;
-    // Actualizar la semilla después de generar el número aleatorio
-    *seed = rand();
-    // Devolver el número aleatorio
-    return pow(2, randomIndex);
+int lerp(int a, int b, float t) {
+    return a + int(t * (b - a));
+}
+
+void drawAnimation(TBoard board, int cellSize, int separation) {
+    board->statusAnimation = false;
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++) {
+
+            int currentValue;
+            // Actualizar la animación
+            if (board->cell[i][j].progress < 1.0) {
+                currentValue = board->cell[i][j].beforeValue;
+                board->cell[i][j].progress += animationSpeed;
+                board->statusAnimation = true;
+            } else {
+                currentValue = board->cell[i][j].value;
+            }
+
+            if (currentValue != 0) {
+                //Calula la pocicion de la celda
+                int fY = separation * (j + 1) + cellSize * (j) + 150;
+                int fX = separation * (i + 1) + cellSize * (i);
+                int tY = separation * (board->cell[i][j].toF + 1) + cellSize * (board->cell[i][j].toF) + 150;
+                int tX = separation * (board->cell[i][j].toC + 1) + cellSize * (board->cell[i][j].toC);
+
+                // Calcular la posición actual en función del progreso
+                int currentX = lerp(fX, tX, board->cell[i][j].progress);
+                int currentY = lerp(fY, tY, board->cell[i][j].progress);
+
+                // Dibujar la celda animada en su posición actual
+                DrawRectangle(currentX, currentY, cellSize, cellSize, colors[(int)log2(currentValue)]);
+                std::string texto = std::to_string(currentValue);
+                DrawText(texto.c_str(), currentX, currentY, cellSize, BLACK);
+            }
+        }
+    }
 }
 
 void moveLeft(TBoard board, unsigned int *seed) {
     for (int i = 0; i < SIZE; i++) {
         for (int j = 0; j < SIZE; j++) {
             int aux = j + 1;
-            // Si el valor que esta en esa celda es 0 va a buscar el proximo valor distinto de 0 y lo va asignar a reasignar.
-            // Si el valor que esta en esa celda es distinto de 0 va a ver si hay uno identico en lo que queda del arreglo. 
+            // Si el valor es 0 va a buscar el proximo valor distinto de 0 y lo va asignar a reasignar. 
             if (board->cell[j][i].value == 0) {
                 while (aux < SIZE && board->cell[aux][i].value == board->cell[j][i].value) {
                     aux++;
                 }
                 if (aux < SIZE) {
+                    // Actualizamos los valores para la animacion
+                    board->statusAnimation = true;
+                    board->cell[j][i].progress = 0;
+                    board->cell[j][i].beforeValue = 0;
                     board->cell[j][i].value = board->cell[aux][i].value;
+                    board->cell[j][i].toF = i;
+                    board->cell[j][i].toC = j;
+                    board->cell[aux][i].progress = 0;
+                    board->cell[aux][i].beforeValue = board->cell[aux][i].value;
                     board->cell[aux][i].value = 0;
+                    board->cell[aux][i].toF = i;
+                    board->cell[aux][i].toC = j;
                     aux++;
                 }
                 while (aux < SIZE && board->cell[aux][i].value == 0) {
                     aux++;
                 }
                 if (aux < SIZE && board->cell[aux][i].value == board->cell[j][i].value){
+                    // Actualizamos los valores para la animacion
+                    board->statusAnimation = true;
+                    board->cell[j][i].progress = 0;
+                    board->cell[j][i].beforeValue = board->cell[j][i].value;
                     board->cell[j][i].value = board->cell[j][i].value * 2;
+                    board->cell[j][i].toF = i;
+                    board->cell[j][i].toC = j;
+                    board->cell[aux][i].progress = 0;
+                    board->cell[aux][i].beforeValue = board->cell[aux][i].value;
                     board->cell[aux][i].value = 0;
+                    board->cell[aux][i].toF = i;
+                    board->cell[aux][i].toC = j;
                 }
-            } else {
+            } else { // Si el valor es distinto de 0 va a ver si hay uno identico en lo que queda del arreglo.
                 while (aux < SIZE && board->cell[aux][i].value == 0) {
                     aux++;
                 }
                 if (aux < SIZE && board->cell[aux][i].value == board->cell[j][i].value){
+                    // Actualizamos los valores para la animacion
+                    board->statusAnimation = true;
+                    board->cell[j][i].progress = 0;
+                    board->cell[j][i].beforeValue = board->cell[j][i].value;
                     board->cell[j][i].value = board->cell[j][i].value * 2;
+                    board->cell[j][i].toF = i;
+                    board->cell[j][i].toC = j;
+                    board->cell[aux][i].progress = 0;
+                    board->cell[aux][i].beforeValue = board->cell[aux][i].value;
                     board->cell[aux][i].value = 0;
+                    board->cell[aux][i].toF = i;
+                    board->cell[aux][i].toC = j;
                 }
             }
         }
@@ -154,11 +222,7 @@ void moveLeft(TBoard board, unsigned int *seed) {
     int fila, columna;
     getRandomCellFree(board, &fila, &columna, seed);
     board->cell[columna][fila].value = getRandomNum(board, seed);
-    board->cell[columna][fila].fromX = fila;
-    board->cell[columna][fila].fromY = columna;
-    board->cell[columna][fila].toX = fila;
-    board->cell[columna][fila].toY = columna;
-    board->cell[columna][fila].progress = 1;
+    board->cell[columna][fila].progress = 0;
 }
 
 void moveRight(TBoard board, unsigned int *seed) {
@@ -172,24 +236,51 @@ void moveRight(TBoard board, unsigned int *seed) {
                     aux--;
                 }
                 if (aux >= 0) {
+                    board->statusAnimation = true;
+                    board->cell[j][i].progress = 0;
+                    board->cell[j][i].beforeValue = 0;
                     board->cell[j][i].value = board->cell[aux][i].value;
+                    board->cell[j][i].toF = i;
+                    board->cell[j][i].toC = j;
+                    board->cell[aux][i].progress = 0;
+                    board->cell[aux][i].beforeValue = board->cell[aux][i].value;
                     board->cell[aux][i].value = 0;
+                    board->cell[aux][i].toF = i;
+                    board->cell[aux][i].toC = j;
                     aux--;
                 }
                 while (aux >= 0 && board->cell[aux][i].value == 0) {
                     aux--;
                 }
                 if (aux >= 0 && board->cell[aux][i].value == board->cell[j][i].value){
+                    board->statusAnimation = true;
+                    board->cell[j][i].progress = 0;
+                    board->cell[j][i].beforeValue = board->cell[j][i].value;
                     board->cell[j][i].value = board->cell[j][i].value * 2;
+                    board->cell[j][i].toF = i;
+                    board->cell[j][i].toC = j;
+                    board->cell[aux][i].progress = 0;
+                    board->cell[aux][i].beforeValue = board->cell[aux][i].value;
                     board->cell[aux][i].value = 0;
+                    board->cell[aux][i].toF = i;
+                    board->cell[aux][i].toC = j;
                 }
             } else {
                 while (aux >= 0 && board->cell[aux][i].value == 0) {
                     aux--;
                 }
                 if (aux >= 0 && board->cell[aux][i].value == board->cell[j][i].value){
+                    board->statusAnimation = true;
+                    board->cell[j][i].progress = 0;
+                    board->cell[j][i].beforeValue = board->cell[j][i].value;
                     board->cell[j][i].value = board->cell[j][i].value * 2;
+                    board->cell[j][i].toF = i;
+                    board->cell[j][i].toC = j;
+                    board->cell[aux][i].progress = 0;
+                    board->cell[aux][i].beforeValue = board->cell[aux][i].value;
                     board->cell[aux][i].value = 0;
+                    board->cell[aux][i].toF = i;
+                    board->cell[aux][i].toC = j;
                 }
             }
         }
@@ -197,11 +288,7 @@ void moveRight(TBoard board, unsigned int *seed) {
     int fila, columna;
     getRandomCellFree(board, &fila, &columna, seed);
     board->cell[columna][fila].value = getRandomNum(board, seed);
-    board->cell[columna][fila].fromX = fila;
-    board->cell[columna][fila].fromY = columna;
-    board->cell[columna][fila].toX = fila;
-    board->cell[columna][fila].toY = columna;
-    board->cell[columna][fila].progress = 1;
+    board->cell[columna][fila].progress = 0;
 }
 
 void moveUp(TBoard board, unsigned int *seed) {
@@ -215,24 +302,51 @@ void moveUp(TBoard board, unsigned int *seed) {
                     aux++;
                 }
                 if (aux < SIZE) {
+                    board->statusAnimation = true;
+                    board->cell[i][j].progress = 0;
+                    board->cell[i][j].beforeValue = 0;
                     board->cell[i][j].value = board->cell[i][aux].value;
+                    board->cell[i][j].toF = j;
+                    board->cell[i][j].toC = i;
+                    board->cell[i][aux].progress = 0;
+                    board->cell[i][aux].beforeValue = board->cell[i][aux].value;
                     board->cell[i][aux].value = 0;
+                    board->cell[i][aux].toF = j;
+                    board->cell[i][aux].toC = i;
                     aux++;
                 }
                 while (aux < SIZE && board->cell[i][aux].value == 0) {
                     aux++;
                 }
                 if (aux < SIZE && board->cell[i][aux].value == board->cell[i][j].value){
-                    board->cell[i][j].value = board->cell[i][j].value * 2;
+                    board->statusAnimation = true;
+                    board->cell[i][j].progress = 0;
+                    board->cell[i][j].beforeValue = board->cell[i][j].value;
+                    board->cell[i][j].value = board->cell[i][aux].value * 2;
+                    board->cell[i][j].toF = j;
+                    board->cell[i][j].toC = i;
+                    board->cell[i][aux].progress = 0;
+                    board->cell[i][aux].beforeValue = board->cell[i][aux].value;
                     board->cell[i][aux].value = 0;
+                    board->cell[i][aux].toF = j;
+                    board->cell[i][aux].toC = i;
                 }
             } else {
                 while (aux < SIZE && board->cell[i][aux].value == 0) {
                     aux++;
                 }
                 if (aux < SIZE && board->cell[i][aux].value == board->cell[i][j].value){
-                    board->cell[i][j].value = board->cell[i][j].value * 2;
+                    board->statusAnimation = true;
+                    board->cell[i][j].progress = 0;
+                    board->cell[i][j].beforeValue = board->cell[i][j].value;
+                    board->cell[i][j].value = board->cell[i][aux].value * 2;
+                    board->cell[i][j].toF = j;
+                    board->cell[i][j].toC = i;
+                    board->cell[i][aux].progress = 0;
+                    board->cell[i][aux].beforeValue = board->cell[i][aux].value;
                     board->cell[i][aux].value = 0;
+                    board->cell[i][aux].toF = j;
+                    board->cell[i][aux].toC = i;
                 }
             }
         }
@@ -240,11 +354,7 @@ void moveUp(TBoard board, unsigned int *seed) {
     int fila, columna;
     getRandomCellFree(board, &fila, &columna, seed);
     board->cell[columna][fila].value = getRandomNum(board, seed);
-    board->cell[columna][fila].fromX = fila;
-    board->cell[columna][fila].fromY = columna;
-    board->cell[columna][fila].toX = fila;
-    board->cell[columna][fila].toY = columna;
-    board->cell[columna][fila].progress = 1;
+    board->cell[columna][fila].progress = 0;
 }
 
 void moveDown(TBoard board, unsigned int *seed) {
@@ -258,24 +368,51 @@ void moveDown(TBoard board, unsigned int *seed) {
                     aux--;
                 }
                 if (aux >= 0) {
+                    board->statusAnimation = true;
+                    board->cell[i][j].progress = 0;
+                    board->cell[i][j].beforeValue = 0;
                     board->cell[i][j].value = board->cell[i][aux].value;
+                    board->cell[i][j].toF = j;
+                    board->cell[i][j].toC = i;
+                    board->cell[i][aux].progress = 0;
+                    board->cell[i][aux].beforeValue = board->cell[i][aux].value;
                     board->cell[i][aux].value = 0;
+                    board->cell[i][aux].toF = j;
+                    board->cell[i][aux].toC = i;
                     aux--;
                 }
                 while (aux >= 0 && board->cell[i][aux].value == 0) {
                     aux--;
                 }
                 if (aux >= 0 && board->cell[i][aux].value == board->cell[i][j].value){
-                    board->cell[i][j].value = board->cell[i][j].value * 2;
+                    board->statusAnimation = true;
+                    board->cell[i][j].progress = 0;
+                    board->cell[i][j].beforeValue = board->cell[i][j].value;
+                    board->cell[i][j].value = board->cell[i][aux].value * 2;
+                    board->cell[i][j].toF = j;
+                    board->cell[i][j].toC = i;
+                    board->cell[i][aux].progress = 0;
+                    board->cell[i][aux].beforeValue = board->cell[i][aux].value;
                     board->cell[i][aux].value = 0;
+                    board->cell[i][aux].toF = j;
+                    board->cell[i][aux].toC = i;
                 }
             } else {
                 while (aux >= 0 && board->cell[i][aux].value == 0) {
                     aux--;
                 }
                 if (aux >= 0 && board->cell[i][aux].value == board->cell[i][j].value){
-                    board->cell[i][j].value = board->cell[i][j].value * 2;
+                    board->statusAnimation = true;
+                    board->cell[i][j].progress = 0;
+                    board->cell[i][j].beforeValue = board->cell[i][j].value;
+                    board->cell[i][j].value = board->cell[i][aux].value * 2;
+                    board->cell[i][j].toF = j;
+                    board->cell[i][j].toC = i;
+                    board->cell[i][aux].progress = 0;
+                    board->cell[i][aux].beforeValue = board->cell[i][aux].value;
                     board->cell[i][aux].value = 0;
+                    board->cell[i][aux].toF = j;
+                    board->cell[i][aux].toC = i;
                 }
             }
         }
@@ -283,9 +420,5 @@ void moveDown(TBoard board, unsigned int *seed) {
     int fila, columna;
     getRandomCellFree(board, &fila, &columna, seed);
     board->cell[columna][fila].value = getRandomNum(board, seed);
-    board->cell[columna][fila].fromX = fila;
-    board->cell[columna][fila].fromY = columna;
-    board->cell[columna][fila].toX = fila;
-    board->cell[columna][fila].toY = columna;
-    board->cell[columna][fila].progress = 1;
+    board->cell[columna][fila].progress = 0;
 }
