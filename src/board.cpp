@@ -21,6 +21,7 @@ struct AnimatedCell {
 struct rep_board {
     int score;
     int dificult;
+    bool statusAnimation;
     AnimatedCell cell[SIZE][SIZE];
 };
 
@@ -33,6 +34,7 @@ TBoard createNewTBoard(unsigned int *seed) {
     TBoard nuevo = new rep_board;
     nuevo->score = 0;
     nuevo->dificult = 3;
+    nuevo->statusAnimation = false;
     for (int i = 0; i < SIZE; i++) {
         for (int j = 0; j < SIZE; j++){
             nuevo->cell[i][j].value = 0; 
@@ -79,6 +81,10 @@ void getRandomCellFree(TBoard board, int *fila, int *columna, unsigned int *seed
 
 int getCellContent(TBoard board, int f, int c) {
     return board->cell[f][c].value;
+}
+
+bool getStatusAnimation(TBoard board) {
+    return board->statusAnimation;
 }
 
 int lerp(int a, int b, float t) {
