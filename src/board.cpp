@@ -10,7 +10,7 @@
 
 #define MAX_COLORS_COUNT 21 // Number of colors available
 
-const float animationSpeed = 0.05;
+const float animationSpeed = 0.01;
 
 struct AnimatedCell {
     int toF, toC;      // New cell position
@@ -153,6 +153,10 @@ void drawAnimation(TBoard board, int cellSize, int separation) {
                 std::string texto = std::to_string(currentValue);
                 DrawText(texto.c_str(), currentX, currentY, cellSize, BLACK);
             }
+
+            if (board->cell[i][j].progress >= 1.0) {
+                board->cell[i][j].beforeValue = 0;
+            }        
         }
     }
 }
@@ -188,7 +192,7 @@ void moveLeft(TBoard board, unsigned int *seed) {
                     // Actualizamos los valores para la animacion
                     board->statusAnimation = true;
                     board->cell[j][i].progress = 0;
-                    board->cell[j][i].beforeValue = board->cell[j][i].value;
+                    board->cell[j][i].beforeValue = 0;
                     board->cell[j][i].value = board->cell[j][i].value * 2;
                     board->cell[j][i].toF = i;
                     board->cell[j][i].toC = j;
@@ -255,7 +259,7 @@ void moveRight(TBoard board, unsigned int *seed) {
                 if (aux >= 0 && board->cell[aux][i].value == board->cell[j][i].value){
                     board->statusAnimation = true;
                     board->cell[j][i].progress = 0;
-                    board->cell[j][i].beforeValue = board->cell[j][i].value;
+                    board->cell[j][i].beforeValue = 0;
                     board->cell[j][i].value = board->cell[j][i].value * 2;
                     board->cell[j][i].toF = i;
                     board->cell[j][i].toC = j;
@@ -321,7 +325,7 @@ void moveUp(TBoard board, unsigned int *seed) {
                 if (aux < SIZE && board->cell[i][aux].value == board->cell[i][j].value){
                     board->statusAnimation = true;
                     board->cell[i][j].progress = 0;
-                    board->cell[i][j].beforeValue = board->cell[i][j].value;
+                    board->cell[i][j].beforeValue = 0;
                     board->cell[i][j].value = board->cell[i][aux].value * 2;
                     board->cell[i][j].toF = j;
                     board->cell[i][j].toC = i;
@@ -387,7 +391,7 @@ void moveDown(TBoard board, unsigned int *seed) {
                 if (aux >= 0 && board->cell[i][aux].value == board->cell[i][j].value){
                     board->statusAnimation = true;
                     board->cell[i][j].progress = 0;
-                    board->cell[i][j].beforeValue = board->cell[i][j].value;
+                    board->cell[i][j].beforeValue = 0;
                     board->cell[i][j].value = board->cell[i][aux].value * 2;
                     board->cell[i][j].toF = j;
                     board->cell[i][j].toC = i;
