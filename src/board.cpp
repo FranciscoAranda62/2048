@@ -156,6 +156,8 @@ void drawAnimation(TBoard board, int cellSize, int separation) {
 
             if (board->cell[i][j].progress >= 1.0) {
                 board->cell[i][j].beforeValue = 0;
+                board->cell[i][j].toC = i;
+                board->cell[i][j].toF = j;
             }        
         }
     }
@@ -174,15 +176,18 @@ void moveLeft(TBoard board, unsigned int *seed) {
                     // Actualizamos los valores para la animacion
                     board->statusAnimation = true;
                     board->cell[j][i].progress = 0;
-                    board->cell[j][i].beforeValue = 0;
+                    if (board->cell[j][i].beforeValue == 0) {
+                        board->cell[j][i].toF = i;
+                        board->cell[j][i].toC = j;
+                    }
                     board->cell[j][i].value = board->cell[aux][i].value;
-                    board->cell[j][i].toF = i;
-                    board->cell[j][i].toC = j;
                     board->cell[aux][i].progress = 0;
-                    board->cell[aux][i].beforeValue = board->cell[aux][i].value;
+                    if (board->cell[aux][i].beforeValue == 0) {
+                        board->cell[aux][i].beforeValue = board->cell[aux][i].value;
+                        board->cell[aux][i].toF = i;
+                        board->cell[aux][i].toC = j;
+                    }
                     board->cell[aux][i].value = 0;
-                    board->cell[aux][i].toF = i;
-                    board->cell[aux][i].toC = j;
                     aux++;
                 }
                 while (aux < SIZE && board->cell[aux][i].value == 0) {
@@ -192,15 +197,18 @@ void moveLeft(TBoard board, unsigned int *seed) {
                     // Actualizamos los valores para la animacion
                     board->statusAnimation = true;
                     board->cell[j][i].progress = 0;
-                    board->cell[j][i].beforeValue = 0;
+                    if (board->cell[j][i].beforeValue == 0) {
+                        board->cell[j][i].toF = i;
+                        board->cell[j][i].toC = j;
+                    }
                     board->cell[j][i].value = board->cell[j][i].value * 2;
-                    board->cell[j][i].toF = i;
-                    board->cell[j][i].toC = j;
                     board->cell[aux][i].progress = 0;
-                    board->cell[aux][i].beforeValue = board->cell[aux][i].value;
+                    if (board->cell[aux][i].beforeValue == 0) {
+                        board->cell[aux][i].beforeValue = board->cell[aux][i].value;
+                        board->cell[aux][i].toF = i;
+                        board->cell[aux][i].toC = j;
+                    }
                     board->cell[aux][i].value = 0;
-                    board->cell[aux][i].toF = i;
-                    board->cell[aux][i].toC = j;
                 }
             } else { // Si el valor es distinto de 0 va a ver si hay uno identico en lo que queda del arreglo.
                 while (aux < SIZE && board->cell[aux][i].value == 0) {
@@ -210,15 +218,19 @@ void moveLeft(TBoard board, unsigned int *seed) {
                     // Actualizamos los valores para la animacion
                     board->statusAnimation = true;
                     board->cell[j][i].progress = 0;
-                    board->cell[j][i].beforeValue = board->cell[j][i].value;
+                    if (board->cell[j][i].beforeValue == 0) {
+                        board->cell[j][i].beforeValue = board->cell[j][i].value;
+                        board->cell[j][i].toF = i;
+                        board->cell[j][i].toC = j;
+                    }
                     board->cell[j][i].value = board->cell[j][i].value * 2;
-                    board->cell[j][i].toF = i;
-                    board->cell[j][i].toC = j;
                     board->cell[aux][i].progress = 0;
-                    board->cell[aux][i].beforeValue = board->cell[aux][i].value;
+                    if (board->cell[aux][i].beforeValue == 0) {
+                        board->cell[aux][i].beforeValue = board->cell[aux][i].value;
+                        board->cell[aux][i].toF = i;
+                        board->cell[aux][i].toC = j;
+                    }
                     board->cell[aux][i].value = 0;
-                    board->cell[aux][i].toF = i;
-                    board->cell[aux][i].toC = j;
                 }
             }
         }
@@ -227,6 +239,8 @@ void moveLeft(TBoard board, unsigned int *seed) {
     getRandomCellFree(board, &fila, &columna, seed);
     board->cell[columna][fila].value = getRandomNum(board, seed);
     board->cell[columna][fila].progress = 0;
+    board->cell[columna][fila].toC = columna;
+    board->cell[columna][fila].toF = fila;
 }
 
 void moveRight(TBoard board, unsigned int *seed) {
@@ -242,15 +256,18 @@ void moveRight(TBoard board, unsigned int *seed) {
                 if (aux >= 0) {
                     board->statusAnimation = true;
                     board->cell[j][i].progress = 0;
-                    board->cell[j][i].beforeValue = 0;
+                    if (board->cell[j][i].beforeValue == 0) {
+                        board->cell[j][i].toF = i;
+                        board->cell[j][i].toC = j;
+                    }
                     board->cell[j][i].value = board->cell[aux][i].value;
-                    board->cell[j][i].toF = i;
-                    board->cell[j][i].toC = j;
                     board->cell[aux][i].progress = 0;
-                    board->cell[aux][i].beforeValue = board->cell[aux][i].value;
+                    if (board->cell[aux][i].beforeValue == 0) {
+                        board->cell[aux][i].beforeValue = board->cell[aux][i].value;
+                        board->cell[aux][i].toF = i;
+                        board->cell[aux][i].toC = j;
+                    }
                     board->cell[aux][i].value = 0;
-                    board->cell[aux][i].toF = i;
-                    board->cell[aux][i].toC = j;
                     aux--;
                 }
                 while (aux >= 0 && board->cell[aux][i].value == 0) {
@@ -259,15 +276,18 @@ void moveRight(TBoard board, unsigned int *seed) {
                 if (aux >= 0 && board->cell[aux][i].value == board->cell[j][i].value){
                     board->statusAnimation = true;
                     board->cell[j][i].progress = 0;
-                    board->cell[j][i].beforeValue = 0;
                     board->cell[j][i].value = board->cell[j][i].value * 2;
-                    board->cell[j][i].toF = i;
-                    board->cell[j][i].toC = j;
+                    if (board->cell[j][i].beforeValue == 0) {
+                        board->cell[j][i].toF = i;
+                        board->cell[j][i].toC = j;
+                    }
                     board->cell[aux][i].progress = 0;
-                    board->cell[aux][i].beforeValue = board->cell[aux][i].value;
+                    if (board->cell[aux][i].beforeValue == 0) {
+                        board->cell[aux][i].beforeValue = board->cell[aux][i].value;
+                        board->cell[aux][i].toF = i;
+                        board->cell[aux][i].toC = j;
+                    }
                     board->cell[aux][i].value = 0;
-                    board->cell[aux][i].toF = i;
-                    board->cell[aux][i].toC = j;
                 }
             } else {
                 while (aux >= 0 && board->cell[aux][i].value == 0) {
@@ -276,15 +296,19 @@ void moveRight(TBoard board, unsigned int *seed) {
                 if (aux >= 0 && board->cell[aux][i].value == board->cell[j][i].value){
                     board->statusAnimation = true;
                     board->cell[j][i].progress = 0;
-                    board->cell[j][i].beforeValue = board->cell[j][i].value;
+                    if (board->cell[j][i].beforeValue == 0) {
+                        board->cell[j][i].beforeValue = board->cell[j][i].value;
+                        board->cell[j][i].toF = i;
+                        board->cell[j][i].toC = j;
+                    }
                     board->cell[j][i].value = board->cell[j][i].value * 2;
-                    board->cell[j][i].toF = i;
-                    board->cell[j][i].toC = j;
                     board->cell[aux][i].progress = 0;
-                    board->cell[aux][i].beforeValue = board->cell[aux][i].value;
+                    if (board->cell[aux][i].beforeValue == 0) {
+                        board->cell[aux][i].beforeValue = board->cell[aux][i].value;
+                        board->cell[aux][i].toF = i;
+                        board->cell[aux][i].toC = j;
+                    }
                     board->cell[aux][i].value = 0;
-                    board->cell[aux][i].toF = i;
-                    board->cell[aux][i].toC = j;
                 }
             }
         }
@@ -293,6 +317,8 @@ void moveRight(TBoard board, unsigned int *seed) {
     getRandomCellFree(board, &fila, &columna, seed);
     board->cell[columna][fila].value = getRandomNum(board, seed);
     board->cell[columna][fila].progress = 0;
+    board->cell[columna][fila].toC = columna;
+    board->cell[columna][fila].toF = fila;
 }
 
 void moveUp(TBoard board, unsigned int *seed) {
@@ -308,15 +334,18 @@ void moveUp(TBoard board, unsigned int *seed) {
                 if (aux < SIZE) {
                     board->statusAnimation = true;
                     board->cell[i][j].progress = 0;
-                    board->cell[i][j].beforeValue = 0;
+                    if (board->cell[i][j].beforeValue == 0) {
+                        board->cell[i][j].toF = j;
+                        board->cell[i][j].toC = i;
+                    }
                     board->cell[i][j].value = board->cell[i][aux].value;
-                    board->cell[i][j].toF = j;
-                    board->cell[i][j].toC = i;
                     board->cell[i][aux].progress = 0;
-                    board->cell[i][aux].beforeValue = board->cell[i][aux].value;
+                    if (board->cell[i][aux].beforeValue == 0) {
+                        board->cell[i][aux].beforeValue = board->cell[i][aux].value;
+                        board->cell[i][aux].toF = j;
+                        board->cell[i][aux].toC = i;
+                    }
                     board->cell[i][aux].value = 0;
-                    board->cell[i][aux].toF = j;
-                    board->cell[i][aux].toC = i;
                     aux++;
                 }
                 while (aux < SIZE && board->cell[i][aux].value == 0) {
@@ -325,15 +354,18 @@ void moveUp(TBoard board, unsigned int *seed) {
                 if (aux < SIZE && board->cell[i][aux].value == board->cell[i][j].value){
                     board->statusAnimation = true;
                     board->cell[i][j].progress = 0;
-                    board->cell[i][j].beforeValue = 0;
+                    if (board->cell[i][j].beforeValue == 0) {
+                        board->cell[i][j].toF = j;
+                        board->cell[i][j].toC = i;
+                    }
                     board->cell[i][j].value = board->cell[i][aux].value * 2;
-                    board->cell[i][j].toF = j;
-                    board->cell[i][j].toC = i;
                     board->cell[i][aux].progress = 0;
-                    board->cell[i][aux].beforeValue = board->cell[i][aux].value;
+                    if (board->cell[i][aux].beforeValue == 0) {
+                        board->cell[i][aux].beforeValue = board->cell[i][aux].value;
+                        board->cell[i][aux].toF = j;
+                        board->cell[i][aux].toC = i;
+                    }
                     board->cell[i][aux].value = 0;
-                    board->cell[i][aux].toF = j;
-                    board->cell[i][aux].toC = i;
                 }
             } else {
                 while (aux < SIZE && board->cell[i][aux].value == 0) {
@@ -342,15 +374,19 @@ void moveUp(TBoard board, unsigned int *seed) {
                 if (aux < SIZE && board->cell[i][aux].value == board->cell[i][j].value){
                     board->statusAnimation = true;
                     board->cell[i][j].progress = 0;
-                    board->cell[i][j].beforeValue = board->cell[i][j].value;
+                    if (board->cell[i][j].beforeValue == 0) {
+                        board->cell[i][j].beforeValue = board->cell[i][j].value;
+                        board->cell[i][j].toF = j;
+                        board->cell[i][j].toC = i;
+                    }
                     board->cell[i][j].value = board->cell[i][aux].value * 2;
-                    board->cell[i][j].toF = j;
-                    board->cell[i][j].toC = i;
                     board->cell[i][aux].progress = 0;
-                    board->cell[i][aux].beforeValue = board->cell[i][aux].value;
+                    if (board->cell[i][aux].beforeValue == 0) {
+                        board->cell[i][aux].beforeValue = board->cell[i][aux].value;
+                        board->cell[i][aux].toF = j;
+                        board->cell[i][aux].toC = i;
+                    }
                     board->cell[i][aux].value = 0;
-                    board->cell[i][aux].toF = j;
-                    board->cell[i][aux].toC = i;
                 }
             }
         }
@@ -359,6 +395,8 @@ void moveUp(TBoard board, unsigned int *seed) {
     getRandomCellFree(board, &fila, &columna, seed);
     board->cell[columna][fila].value = getRandomNum(board, seed);
     board->cell[columna][fila].progress = 0;
+    board->cell[columna][fila].toC = columna;
+    board->cell[columna][fila].toF = fila;
 }
 
 void moveDown(TBoard board, unsigned int *seed) {
@@ -374,15 +412,18 @@ void moveDown(TBoard board, unsigned int *seed) {
                 if (aux >= 0) {
                     board->statusAnimation = true;
                     board->cell[i][j].progress = 0;
-                    board->cell[i][j].beforeValue = 0;
+                    if (board->cell[i][j].beforeValue == 0) {
+                        board->cell[i][j].toF = j;
+                        board->cell[i][j].toC = i;
+                    }
                     board->cell[i][j].value = board->cell[i][aux].value;
-                    board->cell[i][j].toF = j;
-                    board->cell[i][j].toC = i;
                     board->cell[i][aux].progress = 0;
-                    board->cell[i][aux].beforeValue = board->cell[i][aux].value;
+                    if (board->cell[i][aux].beforeValue == 0) {
+                        board->cell[i][aux].beforeValue = board->cell[i][aux].value;
+                        board->cell[i][aux].toF = j;
+                        board->cell[i][aux].toC = i;
+                    }
                     board->cell[i][aux].value = 0;
-                    board->cell[i][aux].toF = j;
-                    board->cell[i][aux].toC = i;
                     aux--;
                 }
                 while (aux >= 0 && board->cell[i][aux].value == 0) {
@@ -391,15 +432,18 @@ void moveDown(TBoard board, unsigned int *seed) {
                 if (aux >= 0 && board->cell[i][aux].value == board->cell[i][j].value){
                     board->statusAnimation = true;
                     board->cell[i][j].progress = 0;
-                    board->cell[i][j].beforeValue = 0;
+                    if (board->cell[i][j].beforeValue == 0) {
+                        board->cell[i][j].toF = j;
+                        board->cell[i][j].toC = i;
+                    }
                     board->cell[i][j].value = board->cell[i][aux].value * 2;
-                    board->cell[i][j].toF = j;
-                    board->cell[i][j].toC = i;
                     board->cell[i][aux].progress = 0;
-                    board->cell[i][aux].beforeValue = board->cell[i][aux].value;
+                    if (board->cell[i][aux].beforeValue == 0) {
+                        board->cell[i][aux].beforeValue = board->cell[i][aux].value;
+                        board->cell[i][aux].toF = j;
+                        board->cell[i][aux].toC = i;
+                    }
                     board->cell[i][aux].value = 0;
-                    board->cell[i][aux].toF = j;
-                    board->cell[i][aux].toC = i;
                 }
             } else {
                 while (aux >= 0 && board->cell[i][aux].value == 0) {
@@ -408,15 +452,19 @@ void moveDown(TBoard board, unsigned int *seed) {
                 if (aux >= 0 && board->cell[i][aux].value == board->cell[i][j].value){
                     board->statusAnimation = true;
                     board->cell[i][j].progress = 0;
-                    board->cell[i][j].beforeValue = board->cell[i][j].value;
+                    if (board->cell[i][j].beforeValue == 0) {
+                        board->cell[i][j].beforeValue = board->cell[i][j].value;
+                        board->cell[i][j].toF = j;
+                        board->cell[i][j].toC = i;
+                    }
                     board->cell[i][j].value = board->cell[i][aux].value * 2;
-                    board->cell[i][j].toF = j;
-                    board->cell[i][j].toC = i;
                     board->cell[i][aux].progress = 0;
-                    board->cell[i][aux].beforeValue = board->cell[i][aux].value;
+                    if (board->cell[i][aux].beforeValue == 0) {
+                        board->cell[i][aux].beforeValue = board->cell[i][aux].value;
+                        board->cell[i][aux].toF = j;
+                        board->cell[i][aux].toC = i;
+                    }
                     board->cell[i][aux].value = 0;
-                    board->cell[i][aux].toF = j;
-                    board->cell[i][aux].toC = i;
                 }
             }
         }
@@ -425,4 +473,6 @@ void moveDown(TBoard board, unsigned int *seed) {
     getRandomCellFree(board, &fila, &columna, seed);
     board->cell[columna][fila].value = getRandomNum(board, seed);
     board->cell[columna][fila].progress = 0;
+    board->cell[columna][fila].toC = columna;
+    board->cell[columna][fila].toF = fila;
 }
