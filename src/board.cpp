@@ -110,7 +110,12 @@ void drawBoard(TBoard board, int cellSize, int separation) {
                 int x = separation * (j + 1) + cellSize * (j);
                 int y = separation * (i + 1) + cellSize * (i) + 150;
                 //Dibuja la celda y imprime el contenido del tablero
-                DrawRectangle(x, y, cellSize, cellSize, colors[(int)log2(getCellContent(board, j, i))]);
+                Rectangle rec;
+                rec.height = cellSize;
+                rec.width = cellSize;
+                rec.x = x;
+                rec.y = y;
+                DrawRectangleRounded(rec, 0.4, 1, colors[(int)log2(getCellContent(board, j, i))]);
                 std::string texto = std::to_string(getCellContent(board, j, i));
                 DrawText(texto.c_str(), x, y, cellSize, BLACK);
             }
@@ -149,7 +154,12 @@ void drawAnimation(TBoard board, int cellSize, int separation) {
                 int currentY = lerp(fY, tY, board->cell[i][j].progress);
 
                 // Dibujar la celda animada en su posición actual
-                DrawRectangle(currentX, currentY, cellSize, cellSize, colors[(int)log2(currentValue)]);
+                Rectangle rec;
+                rec.height = cellSize;
+                rec.width = cellSize;
+                rec.x = currentX;
+                rec.y = currentY;
+                DrawRectangleRounded(rec, 0.4, 1, colors[(int)log2(currentValue)]);
                 std::string texto = std::to_string(currentValue);
                 DrawText(texto.c_str(), currentX, currentY, cellSize, BLACK);
             }
