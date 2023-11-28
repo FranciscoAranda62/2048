@@ -249,8 +249,6 @@ void moveLeft(TBoard board, unsigned int *seed) {
     getRandomCellFree(board, &fila, &columna, seed);
     board->cell[columna][fila].value = getRandomNum(board, seed);
     board->cell[columna][fila].progress = 0;
-    board->cell[columna][fila].toC = columna;
-    board->cell[columna][fila].toF = fila;
 }
 
 void moveRight(TBoard board, unsigned int *seed) {
@@ -327,8 +325,6 @@ void moveRight(TBoard board, unsigned int *seed) {
     getRandomCellFree(board, &fila, &columna, seed);
     board->cell[columna][fila].value = getRandomNum(board, seed);
     board->cell[columna][fila].progress = 0;
-    board->cell[columna][fila].toC = columna;
-    board->cell[columna][fila].toF = fila;
 }
 
 void moveUp(TBoard board, unsigned int *seed) {
@@ -405,8 +401,6 @@ void moveUp(TBoard board, unsigned int *seed) {
     getRandomCellFree(board, &fila, &columna, seed);
     board->cell[columna][fila].value = getRandomNum(board, seed);
     board->cell[columna][fila].progress = 0;
-    board->cell[columna][fila].toC = columna;
-    board->cell[columna][fila].toF = fila;
 }
 
 void moveDown(TBoard board, unsigned int *seed) {
@@ -483,6 +477,4 @@ void moveDown(TBoard board, unsigned int *seed) {
     getRandomCellFree(board, &fila, &columna, seed);
     board->cell[columna][fila].value = getRandomNum(board, seed);
     board->cell[columna][fila].progress = 0;
-    board->cell[columna][fila].toC = columna;
-    board->cell[columna][fila].toF = fila;
 }
