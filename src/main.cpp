@@ -76,7 +76,8 @@ int main(void)
         // Draw
         //----------------------------------------------------------------------------------
         BeginDrawing();
-            ClearBackground(RAYWHITE);
+            ClearBackground(BLACK);
+            drawBackground(cellSize, separation);
             if (getStatusAnimation(board) == true) {
                 drawAnimation(board, cellSize, separation);
             } else {

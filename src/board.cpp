@@ -102,6 +102,28 @@ int getRandomNum(TBoard board, unsigned int *seed) {
     return pow(2, randomIndex);
 }
 
+void drawBackground(int cellSize, int separation) {
+    Rectangle rec;
+    rec.height = cellSize * 4 + separation * 5;
+    rec.width = cellSize * 4 + separation * 5;
+    rec.x = 0;
+    rec.y = 150;
+    DrawRectangleRounded(rec, 0.1, 4, GRAY);
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++) {
+            //Calula la pocicion de la nueva celda en cada iteracion
+            int x = separation * (j + 1) + cellSize * (j);
+            int y = separation * (i + 1) + cellSize * (i) + 150;
+            //Dibuja la celda y imprime el contenido del tablero
+            rec.height = cellSize;
+            rec.width = cellSize;
+            rec.x = x;
+            rec.y = y;
+            DrawRectangleRounded(rec, 0.4, 1, BLACK);
+        }
+    }
+}
+
 void drawBoard(TBoard board, int cellSize, int separation) {
     for (int i = 0; i < SIZE; i++) {
         for (int j = 0; j < SIZE; j++) {

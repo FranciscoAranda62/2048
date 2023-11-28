@@ -25,6 +25,9 @@ int getRandomNum(TBoard board, unsigned int *seed);
 
 // RENDERERS
 
+// Draw background
+void drawBackground(int cellSize, int separation);
+
 // Draw the static board 
 void drawBoard(TBoard board, int cellSize, int separation);
 
