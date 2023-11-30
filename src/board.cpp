@@ -11,6 +11,7 @@
 #define MAX_COLORS_COUNT 21 // Number of colors available
 
 const float animationSpeed = 0.01;
+const int heightBoard = 230;
 
 struct AnimatedCell {
     int toF, toC;      // New cell position
@@ -107,13 +108,13 @@ void drawBackground(int cellSize, int separation) {
     rec.height = cellSize * 4 + separation * 5;
     rec.width = cellSize * 4 + separation * 5;
     rec.x = 0;
-    rec.y = 150;
+    rec.y = heightBoard;
     DrawRectangleRounded(rec, 0.1, 4, GRAY);
     for (int i = 0; i < SIZE; i++) {
         for (int j = 0; j < SIZE; j++) {
             //Calula la pocicion de la nueva celda en cada iteracion
             int x = separation * (j + 1) + cellSize * (j);
-            int y = separation * (i + 1) + cellSize * (i) + 150;
+            int y = separation * (i + 1) + cellSize * (i) + heightBoard;
             //Dibuja la celda y imprime el contenido del tablero
             rec.height = cellSize;
             rec.width = cellSize;
@@ -130,7 +131,7 @@ void drawBoard(TBoard board, int cellSize, int separation) {
             if (getCellContent(board, j, i) != 0) {
                 //Calula la pocicion de la nueva celda en cada iteracion
                 int x = separation * (j + 1) + cellSize * (j);
-                int y = separation * (i + 1) + cellSize * (i) + 150;
+                int y = separation * (i + 1) + cellSize * (i) + heightBoard;
                 //Dibuja la celda y imprime el contenido del tablero
                 Rectangle rec;
                 rec.height = cellSize;
@@ -166,9 +167,9 @@ void drawAnimation(TBoard board, int cellSize, int separation) {
 
             if (currentValue != 0) {
                 //Calula la pocicion de la celda
-                int fY = separation * (j + 1) + cellSize * (j) + 150;
+                int fY = separation * (j + 1) + cellSize * (j) + heightBoard;
                 int fX = separation * (i + 1) + cellSize * (i);
-                int tY = separation * (board->cell[i][j].toF + 1) + cellSize * (board->cell[i][j].toF) + 150;
+                int tY = separation * (board->cell[i][j].toF + 1) + cellSize * (board->cell[i][j].toF) + heightBoard;
                 int tX = separation * (board->cell[i][j].toC + 1) + cellSize * (board->cell[i][j].toC);
 
                 // Calcular la posición actual en función del progreso
