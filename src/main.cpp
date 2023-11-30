@@ -37,7 +37,7 @@ int main(void)
         // Update
         //----------------------------------------------------------------------------------
         if (IsKeyDown(KEY_RIGHT)) {
-            if (!rightKeyPressed) {
+            if (!rightKeyPressed && getStatusAnimation(board) == false) {
                 moveRight(board, &seed);
                 rightKeyPressed = true;
             }
@@ -46,7 +46,7 @@ int main(void)
         }
         
         if (IsKeyDown(KEY_LEFT)) {
-            if (!leftKeyPressed) {
+            if (!leftKeyPressed && getStatusAnimation(board) == false) {
                 moveLeft(board, &seed);
                 leftKeyPressed = true;
             }
@@ -55,7 +55,7 @@ int main(void)
         }
 
         if (IsKeyDown(KEY_UP)) {
-            if (!upKeyPressed) {
+            if (!upKeyPressed && getStatusAnimation(board) == false) {
                 moveUp(board, &seed);
                 upKeyPressed = true;
             }
@@ -64,7 +64,7 @@ int main(void)
         }
 
         if (IsKeyDown(KEY_DOWN)) {
-            if (!downKeyPressed) {
+            if (!downKeyPressed && getStatusAnimation(board) == false) {
                 moveDown(board, &seed);
                 downKeyPressed = true;
             }
