@@ -130,17 +130,22 @@ void drawBoard(TBoard board, int cellSize, int separation) {
         for (int j = 0; j < SIZE; j++) {
             if (getCellContent(board, j, i) != 0) {
                 //Calula la pocicion de la nueva celda en cada iteracion
-                int x = separation * (j + 1) + cellSize * (j);
-                int y = separation * (i + 1) + cellSize * (i) + heightBoard;
-                //Dibuja la celda y imprime el contenido del tablero
                 Rectangle rec;
                 rec.height = cellSize;
                 rec.width = cellSize;
-                rec.x = x;
-                rec.y = y;
-                DrawRectangleRounded(rec, 0.4, 1, colors[(int)log2(getCellContent(board, j, i))]);
+                rec.x = separation * (j + 1) + cellSize * (j);
+                rec.y = separation * (i + 1) + cellSize * (i) + heightBoard;
+                // Text size and position
+                int fontSize = cellSize;
                 std::string texto = std::to_string(getCellContent(board, j, i));
-                DrawText(texto.c_str(), x, y, cellSize, BLACK);
+                while (MeasureText(texto.c_str(), fontSize) > cellSize - 10) {
+                    fontSize = fontSize - 5;
+                }
+                int textX = rec.x + (rec.height * 0.5) - MeasureText(texto.c_str(), fontSize) * 0.5;
+                int textY = rec.y + (rec.width * 0.5) - (fontSize * 0.5);
+                //Dibuja la celda y imprime el contenido del tablero
+                DrawRectangleRounded(rec, 0.4, 1, colors[(int)log2(getCellContent(board, j, i))]);
+                DrawText(texto.c_str(), textX, textY, fontSize, BLACK);
             }
         }
     }
@@ -175,16 +180,24 @@ void drawAnimation(TBoard board, int cellSize, int separation) {
                 // Calcular la posición actual en función del progreso
                 int currentX = lerp(fX, tX, board->cell[i][j].progress);
                 int currentY = lerp(fY, tY, board->cell[i][j].progress);
-
-                // Dibujar la celda animada en su posición actual
                 Rectangle rec;
                 rec.height = cellSize;
                 rec.width = cellSize;
                 rec.x = currentX;
                 rec.y = currentY;
-                DrawRectangleRounded(rec, 0.4, 1, colors[(int)log2(currentValue)]);
+
+                // Text size and position
+                int fontSize = cellSize;
                 std::string texto = std::to_string(currentValue);
-                DrawText(texto.c_str(), currentX, currentY, cellSize, BLACK);
+                while (MeasureText(texto.c_str(), fontSize) > cellSize - 10) {
+                    fontSize = fontSize - 5;
+                }
+                int textX = rec.x + (rec.height * 0.5) - MeasureText(texto.c_str(), fontSize) * 0.5;
+                int textY = rec.y + (rec.width * 0.5) - (fontSize * 0.5);
+
+                // Dibujar la celda animada en su posición actual
+                DrawRectangleRounded(rec, 0.4, 1, colors[(int)log2(currentValue)]);
+                DrawText(texto.c_str(), textX, textY, fontSize, BLACK);
             }
 
             if (board->cell[i][j].progress >= 1.0) {
