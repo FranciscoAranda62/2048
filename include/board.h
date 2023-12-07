@@ -34,6 +34,8 @@ void drawBoard(TBoard board, int cellSize, int separation);
 // Draw the board when it is moving
 void drawAnimation(TBoard board, int cellSize, int separation);
 
+void drawScore(TBoard board, int cellSize, int separation);
+
 // UPDATERS
 
 // Move all valid cell to the left and join if valid

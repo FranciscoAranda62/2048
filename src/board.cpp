@@ -53,6 +53,7 @@ TBoard createNewTBoard(unsigned int *seed) {
     nuevo->cell[columna][fila].toF = fila;
     nuevo->cell[columna][fila].toC = columna;
     nuevo->cell[columna][fila].progress = 1;
+    nuevo->score = nuevo->score + nuevo->cell[columna][fila].value;
     return nuevo;
 }
 
@@ -209,6 +210,20 @@ void drawAnimation(TBoard board, int cellSize, int separation) {
     }
 }
 
+void drawScore(TBoard board, int cellSize, int separation) {
+    Rectangle rec;
+    rec.height = cellSize;
+    rec.width = cellSize * 2;
+    rec.x = heightBoard - (cellSize * 2);
+    rec.y = cellSize;
+    int fontSize = cellSize - (cellSize / 5);
+    std::string texto = std::to_string(board->score);
+    int textX = rec.x + (rec.width * 0.5) - MeasureText(texto.c_str(), fontSize) * 0.5;
+    int textY = rec.y + (rec.height * 0.5) - (fontSize * 0.5);
+    DrawRectangleRounded(rec, 0.4, 1, GRAY);
+    DrawText(texto.c_str(), textX, textY, fontSize, BLACK);
+}
+
 void moveLeft(TBoard board, unsigned int *seed) {
     for (int i = 0; i < SIZE; i++) {
         for (int j = 0; j < SIZE; j++) {
@@ -285,6 +300,7 @@ void moveLeft(TBoard board, unsigned int *seed) {
     getRandomCellFree(board, &fila, &columna, seed);
     board->cell[columna][fila].value = getRandomNum(board, seed);
     board->cell[columna][fila].progress = 0;
+    board->score = board->score + board->cell[columna][fila].value;
 }
 
 void moveRight(TBoard board, unsigned int *seed) {
@@ -361,6 +377,7 @@ void moveRight(TBoard board, unsigned int *seed) {
     getRandomCellFree(board, &fila, &columna, seed);
     board->cell[columna][fila].value = getRandomNum(board, seed);
     board->cell[columna][fila].progress = 0;
+    board->score = board->score + board->cell[columna][fila].value;
 }
 
 void moveUp(TBoard board, unsigned int *seed) {
@@ -437,6 +454,7 @@ void moveUp(TBoard board, unsigned int *seed) {
     getRandomCellFree(board, &fila, &columna, seed);
     board->cell[columna][fila].value = getRandomNum(board, seed);
     board->cell[columna][fila].progress = 0;
+    board->score = board->score + board->cell[columna][fila].value;
 }
 
 void moveDown(TBoard board, unsigned int *seed) {
@@ -513,4 +531,5 @@ void moveDown(TBoard board, unsigned int *seed) {
     getRandomCellFree(board, &fila, &columna, seed);
     board->cell[columna][fila].value = getRandomNum(board, seed);
     board->cell[columna][fila].progress = 0;
+    board->score = board->score + board->cell[columna][fila].value;
 }
