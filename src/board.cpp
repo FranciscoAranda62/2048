@@ -211,17 +211,31 @@ void drawAnimation(TBoard board, int cellSize, int separation) {
 }
 
 void drawScore(TBoard board, int cellSize, int separation) {
-    Rectangle rec;
-    rec.height = cellSize;
-    rec.width = cellSize * 2;
-    rec.x = heightBoard - (cellSize * 2);
-    rec.y = cellSize;
-    int fontSize = cellSize - (cellSize / 5);
+    int fontSize = cellSize / 3;
+    char textScore[] = "SCORE";
+    char textHighScore[] = "HIGH SCORE";
+
+    Rectangle rec1;
+    rec1.height = cellSize;
+    rec1.width = cellSize * 2;
+    rec1.x = separation * 2;
+    rec1.y = heightBoard - (cellSize + (separation * 2));
+    Rectangle rec2;
+    rec2.height = cellSize;
+    rec2.width = cellSize * 2;
+    rec2.x = cellSize * 2 + separation * 3;
+    rec2.y = heightBoard - (cellSize + (separation * 2));
+
+    DrawRectangleRounded(rec1, 0.4, 1, GRAY);
+    DrawRectangleRounded(rec2, 0.4, 1, GRAY);
+
     std::string texto = std::to_string(board->score);
-    int textX = rec.x + (rec.width * 0.5) - MeasureText(texto.c_str(), fontSize) * 0.5;
-    int textY = rec.y + (rec.height * 0.5) - (fontSize * 0.5);
-    DrawRectangleRounded(rec, 0.4, 1, GRAY);
+    int textX = rec1.x + (rec1.width * 0.5) - MeasureText(texto.c_str(), fontSize) * 0.5;
+    int textY = rec1.y + (rec1.height / 2) + ((rec1.height / 2) * 0.5) - (fontSize * 0.5);
     DrawText(texto.c_str(), textX, textY, fontSize, BLACK);
+    textX = rec1.x + (rec1.width * 0.5) - MeasureText(textScore, fontSize) * 0.5;
+    textY = rec1.y + ((rec1.height / 2) * 0.5) - (fontSize * 0.5);
+    DrawText(textScore, textX, textY, fontSize, BLACK);
 }
 
 void moveLeft(TBoard board, unsigned int *seed) {
